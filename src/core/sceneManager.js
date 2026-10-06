@@ -13,6 +13,7 @@ import { el } from './dom.js';
  *     next: 'scene3',          // where ctx.next() goes
  *     ambience: 'amb.town',    // looping bed for this scene (null = silence)
  *     music: 0.35,             // music level for this scene (omit to leave as is)
+ *     narration: false,        // no storyteller in this scene (default: on)
  *     create(ctx) {            // build DOM + timeline; return { timeline?, destroy? }
  *   }
  *
@@ -28,9 +29,9 @@ import { el } from './dom.js';
  * must go through ctx.track(fn) to be captured too. Non-GSAP cleanup
  * (ticker callbacks, listeners) goes through ctx.onCleanup(fn).
  */
-export function createSceneManager({ stage, audio, scenes, fallback }) {
+export function createSceneManager({ stage, audio, narration, scenes, fallback }) {
   const container = stage.el.querySelector('[data-scenes]');
-  const narration = stage.el.querySelector('[data-narration]');
+  const liveRegion = stage.el.querySelector('[data-narration]');
   const veil = createVeil(stage.el.querySelector('.stage__veil'));
 
   let current = null;
@@ -67,7 +68,7 @@ export function createSceneManager({ stage, audio, scenes, fallback }) {
       },
       /** Announce narration to screen readers. */
       announce: (text) => {
-        narration.textContent = text;
+        liveRegion.textContent = text;
       },
       next: (opts) => goTo(def.next ?? fallback, opts),
       goTo: (id, opts) => goTo(id, opts),
@@ -97,6 +98,7 @@ export function createSceneManager({ stage, audio, scenes, fallback }) {
   }
 
   function applyAudio(def) {
+    narration.setEnabled(def.narration !== false);
     audio.setAmbience(def.ambience ?? null);
     audio.setAmbienceLevel(def.ambienceLevel ?? 1);
     if (typeof def.music === 'number') audio.setMusic(def.music);
@@ -125,6 +127,8 @@ export function createSceneManager({ stage, audio, scenes, fallback }) {
     const smooth = previous && !previous.dead && (transition === 'cut' || transition === 'dissolve');
 
     if (!smooth) {
+      // A hard change (restart, Watch again): the old scene's voice goes with it.
+      narration.stop(Math.min(fadeOut, 0.6));
       if (previous) {
         await veil.close(fadeOut);
         if (mine !== token) return;
@@ -132,7 +136,7 @@ export function createSceneManager({ stage, audio, scenes, fallback }) {
       }
       lingering.forEach(unmount);
       current = null;
-      narration.textContent = '';
+      liveRegion.textContent = '';
     }
 
     const scene = mount(def, { handoff, entry: smooth ? transition : 'fade' });

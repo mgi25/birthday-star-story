@@ -25,7 +25,8 @@ export default {
     frame.world.appendChild(flies.el);
     ctx.onCleanup(flies.destroy);
     const edge = () => stage.metrics.halfWidth + 60;
-    const fly = flies.add({ x: -900, y: 520, size: 1.5, alpha: 1, glow: 1.2, wander: 5 });
+    // The same firefly as in the forest, seen up close this time.
+    const fly = flies.addHero({ x: -900, y: 520, size: 1.5, alpha: 1, glow: 1.2, wander: 5, length: 32 });
 
     const line = el('p', 'credits-line', frame.ui);
     line.textContent = 'Still counts as a star.';
@@ -45,6 +46,8 @@ export default {
       ],
     }, 2);
     tl.call(() => audio.play('sfx.firefly'), null, 2.4);
+    // As it slows down in front of us, the light turns out to have wings.
+    tl.to(fly, { form: 1, duration: 2.2, ease: 'sine.inOut' }, 4.4);
     tl.to(fly, { wander: 3, glow: 1.5, duration: 1 }, 6.2);
 
     // It stops in the middle.
@@ -58,6 +61,6 @@ export default {
     // Completely dark. Then, quietly, the way back to the beginning.
     tl.add(button.show({ duration: 2 }), 17);
 
-    return { timeline: tl };
+    return { timeline: tl, debug: { fly, flies } };
   },
 };

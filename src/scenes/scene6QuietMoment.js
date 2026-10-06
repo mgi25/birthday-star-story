@@ -56,7 +56,7 @@ export default {
 
     const story = el('div', 'story-ui', frame.ui);
     const captions = createCaptions(story, { reduced, announce: ctx.announce });
-    const remembered = captions.line('Then he remembered something.');
+    const remembered = captions.narrated('scene6-01'); // "Then he remembered something."
 
     const tl = gsap.timeline({ paused: true });
 

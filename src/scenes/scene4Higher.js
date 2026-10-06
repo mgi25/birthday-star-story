@@ -58,7 +58,8 @@ export default {
 
     const story = el('div', 'story-ui', frame.ui);
     const captions = createCaptions(story, { reduced, announce: ctx.announce });
-    const [kept, surely, higher, closer] = ['So he kept going.', 'Because surely…', '…the higher he went…', '…the closer he would be.'].map((t) => captions.line(t));
+    // "So he kept going." "Because surely…" "…the higher he went…" "…the closer he would be."
+    const [kept, surely, higher, closer] = ['scene4-01', 'scene4-02', 'scene4-03', 'scene4-04'].map((id) => captions.narrated(id));
 
     // Never let the camera dip below the ground line (the world ends there).
     const target = () => ({ x: boy.pose.x + FRAME.x, y: Math.min(0, boy.pose.y - FRAME.y) });
@@ -80,7 +81,7 @@ export default {
     tl.add(toStep, 0.2);
     tl.to(blend, { k: 1, duration: 3.6, ease: EASE.camera, onUpdate: crane }, 0);
     tl.to(star, { alpha: 0.6, glow: 0.3, flare: 0.2, duration: 3 }, 0.5);
-    tl.add(kept.play({ hold: 2.2 }), 2.6);
+    captions.at(tl, kept, 2.6, { hold: 2.2 });
 
     // A big step up: a hand on the rock, and up.
     tl.addLabel('step', 0.2 + toStep.duration());
@@ -113,7 +114,7 @@ export default {
     tl.set(forest, { opacity: 0 }, covered);
     tl.set(star, { alpha: 0 }, covered);
     tl.set(boy.pose, { wind: 1.35 }, covered);
-    tl.add(surely.play({ hold: 1.4 }), 'crane+=1');
+    captions.at(tl, surely, 'crane+=1', { hold: 1.4 });
     tl.call(() => audio.setMusic(0.6, { fade: 4 }), null, 'crane');
 
     // He hauls himself over the edge.
@@ -135,15 +136,15 @@ export default {
     tl.add(boy.to({ head: 4 }, { duration: 0.3 }), 'slip+=1.2');
     tl.add(boy.turn(1, { duration: 0.3 }), 'slip+=2');
     tl.add(boy.to({ ...POSES.straps, head: -4, lean: 0 }, { duration: 0.6 }), 'slip+=2.3');
-    tl.add(higher.play({ hold: 1.5 }), 'slip+=2.5');
+    captions.at(tl, higher, 'slip+=2.5', { hold: 1.5 });
     tl.add(boy.stroll(STAGES.B.from + 300, { from: slipX - 16, speed: UPHILL - 4, accel: 0.8, decel: 1.4 }), 'slip+=2.7');
-    tl.add(closer.play({ hold: 1.9 }), 'slip+=6.7');
+    const lastLine = captions.at(tl, closer, 'slip+=6.7', { hold: 1.9 });
     const ridgeEnd = tl.labels.slip + 7.6;
     tl.add(follow(ridgeEnd - tl.labels.ridge), 'ridge');
     tl.add(boy.to({ head: -32 }, { duration: 1.2 }), 'slip+=7');
 
-    // --- The camera rises into cloud (after the last line has gone).
-    tl.addLabel('rise', 'slip+=8.3');
+    // --- The camera rises into cloud; the last line is gone by the time it is inside.
+    tl.addLabel('rise', Math.max(tl.labels.slip + 8.3, lastLine.end - 3.15));
     tl.add(camera.to({ y: '-=320', x: '+=40', duration: 3, ease: 'power1.in' }), 'rise');
     tl.to(wash, { opacity: 1, duration: 2.4, ease: 'sine.in' }, 'rise+=0.6');
     tl.call(() => ctx.next({ transition: 'cut', handoff: { wash: 1 } }), null, 'rise+=3');

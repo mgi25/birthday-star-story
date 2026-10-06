@@ -19,14 +19,15 @@ import { buildSummit, summitY, SUMMIT } from '../worlds/summit.js';
 /** Scene 5's final framing; Scene 6 dissolves from it. */
 export const SCENE5_END = { zoom: 1, y: -60, focusX: -40, focusY: 860 };
 
+/** Narration (text and recordings: audio/narrationScript.js). */
 const LINES = {
-  reached: 'He had finally reached the stars.',
-  hundreds: 'There were hundreds of them.',
-  beautiful: 'Beautiful ones.',
-  rare: 'Rare ones.',
-  bright: 'Bright ones.',
-  somehow: 'But somehow…',
-  none: '…none of them felt like the one he was looking for.',
+  reached: 'scene5-01', // He had finally reached the stars.
+  hundreds: 'scene5-02', // There were hundreds of them.
+  beautiful: 'scene5-03', // Beautiful ones.
+  rare: 'scene5-04', // Rare ones.
+  bright: 'scene5-05', // Bright ones.
+  somehow: 'scene5-06', // But somehow…
+  none: 'scene5-07', // …none of them felt like the one he was looking for.
 };
 
 export default {
@@ -66,7 +67,7 @@ export default {
 
     const story = el('div', 'story-ui', frame.ui);
     const captions = createCaptions(story, { reduced, announce: ctx.announce });
-    const line = Object.fromEntries(Object.entries(LINES).map(([k, t]) => [k, captions.line(t)]));
+    const line = Object.fromEntries(Object.entries(LINES).map(([k, id]) => [k, captions.narrated(id)]));
 
     const tl = gsap.timeline({ paused: true });
 

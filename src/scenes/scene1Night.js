@@ -31,11 +31,8 @@ const BEAT = {
   line1: 13.3,
 };
 
-const LINES = [
-  'Once, there was a boy who spent far too much time looking at the stars.',
-  'One night, he had a thought.',
-  'What if he could find the brightest one?',
-];
+/** Narration (text and recordings: audio/narrationScript.js). */
+const LINES = ['scene1-01', 'scene1-02', 'scene1-03'];
 
 /** How the brightest star looks once it has shone (Scene 2 continues from this). */
 export const HERO_SHINING = { alpha: 1, size: 2.4, glow: 1, flare: 1, pulse: 1 };
@@ -78,7 +75,7 @@ export default {
     // --- narration and the Begin button
     const story = el('div', 'story-ui', frame.ui);
     const captions = createCaptions(story, { reduced, announce: ctx.announce });
-    const [line1, line2, line3] = LINES.map((text) => captions.line(text));
+    const [line1, line2, line3] = LINES.map((id) => captions.narrated(id));
 
     const begin = createCineButton({
       label: 'Begin',
@@ -144,7 +141,7 @@ export default {
     }
 
     // "Once, there was a boy…"
-    tl.add(line1.play(), BEAT.line1);
+    captions.at(tl, line1, BEAT.line1);
     if (windowOff) tl.to(windowOff, { opacity: 0, duration: 0.25, ease: 'none' }, BEAT.line1 + 5.2);
 
     // Pause. He keeps looking up, settling his weight.
@@ -166,14 +163,14 @@ export default {
     // "One night, he had a thought." He looks down, hand to chin.
     tl.addLabel('thought', 'notice+=2.1');
     tl.add(boy.to({ ...POSES.thinking, head: -4, lean: 0 }, { duration: 1.3 }), 'thought');
-    tl.add(line2.play({ hold: 3.2 }), 'thought+=0.4');
+    captions.at(tl, line2, 'thought+=0.4', { hold: 3.2 });
     if (windowOn) tl.to(windowOn, { opacity: 0.85, duration: 0.25, ease: 'none' }, 'thought+=2.2');
 
     // "What if he could find the brightest one?" Eyes back up, straps gripped.
     tl.addLabel('question', '+=0.7');
     tl.add(boy.to({ ...POSES.rest, head: -24 }, { duration: 1.1 }), 'question-=1.3');
     tl.add(boy.to({ ...POSES.straps, head: -33, lean: 1.5 }, { duration: 1.4, ease: EASE.settle }), 'question');
-    tl.add(line3.play({ keep: true }), 'question+=0.4');
+    captions.at(tl, line3, 'question+=0.4', { keep: true });
 
     // Begin.
     tl.add(begin.show(), '+=1.1');

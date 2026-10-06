@@ -105,6 +105,20 @@
   height: 100%;
 }
 
+.fireflies {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* The hero firefly: a small canvas that travels with it. */
+.firefly {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  will-change: transform;
+}
+
 /* ---------- characters ---------- */
 
 .character {

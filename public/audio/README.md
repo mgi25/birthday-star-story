@@ -2,6 +2,9 @@
 
 Put recordings here (mp3 or m4a/aac play on every phone; add an ogg too if you like).
 
+Narration goes in `narration/` instead, one mp3 per line, named by line (see `narration/README.md`).
+Those need no code changes: the film picks them up by name.
+
 Then point the matching cue at the file in `src/audio/cues.js`:
 
 ```js

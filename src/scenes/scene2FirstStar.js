@@ -79,7 +79,7 @@ export default {
 
     const story = el('div', 'story-ui', frame.ui);
     const captions = createCaptions(story, { reduced, announce: ctx.announce });
-    const line = captions.line('Apparently, stars were harder to catch than he expected.');
+    const line = captions.narrated('scene2-01'); // "Apparently, stars were harder to catch than he expected."
 
     // --- the bright star's approach: it leaves the sky and comes down to the hill
     // Positions for the near star are in the world container's own (pre-zoom) space.
@@ -142,14 +142,14 @@ export default {
     tl.add(boy.to({ ...POSES.lookHand, lift: 0, lean: 1, head: -14 }, { duration: 1.1, ease: 'power2.inOut' }), 'blink+=0.9');
 
     // "Apparently, stars were harder to catch than he expected."
-    tl.add(line.play({ hold: 3.1 }), 'blink+=2');
+    const said = captions.at(tl, line, 'blink+=2', { hold: 3.1 });
     tl.add(boy.to({ head: -6 }, { duration: 0.5, ease: 'power1.inOut', yoyo: true, repeat: 1 }), 'blink+=3');
     tl.add(boy.to({ ...POSES.rest, head: 2, lean: 0, lift: 0.8 }, { duration: 1.6 }), 'blink+=4.6');
     tl.add(camera.to({ zoom: 1, focusX: 40, focusY: 560, duration: 3.4, ease: 'sine.inOut' }), 'blink+=4.6');
 
-    // A faint warm glow, farther away, toward the forest. He notices.
+    // A faint warm glow, farther away, toward the forest. He notices (once the line has been said).
     if (glow) tl.to(glow, { opacity: 1, duration: 2.4, ease: EASE.drift }, 'blink+=5.1');
-    tl.addLabel('notice', 'blink+=6.2');
+    tl.addLabel('notice', Math.max(tl.labels.blink + 6.2, said.speechEnd + 0.5));
     tl.add(boy.to({ head: 6, lean: 2, lift: -1.4 }, { duration: 0.7, ease: EASE.react }), 'notice');
     tl.add(boy.to({ lift: 0 }, { duration: 0.5 }), 'notice+=0.7');
 

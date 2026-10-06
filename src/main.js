@@ -10,6 +10,7 @@ import { gsap } from './animation/gsap.js';
 import { createStage } from './core/stage.js';
 import { createSceneManager } from './core/sceneManager.js';
 import { audio } from './audio/audioManager.js';
+import { narration } from './audio/narration.js';
 import { installGrain } from './components/grain.js';
 import { createSoundToggle } from './components/soundToggle.js';
 import { scenes, FIRST_SCENE, FALLBACK_SCENE } from './scenes/index.js';
@@ -30,7 +31,7 @@ const stage = createStage(document.getElementById('stage'));
 installGrain(stage.el.querySelector('.stage__grain'));
 createSoundToggle(stage.el, audio);
 
-const manager = createSceneManager({ stage, audio, scenes, fallback: FALLBACK_SCENE });
+const manager = createSceneManager({ stage, audio, narration, scenes, fallback: FALLBACK_SCENE });
 
 const speed = Number(params.get('speed'));
 if (speed > 0) gsap.globalTimeline.timeScale(speed);
@@ -41,14 +42,15 @@ function startScene() {
   manager.goTo(id && scenes[id] ? id : FIRST_SCENE, { seek: Number(params.get('t')) || 0 });
 }
 
-// Wait briefly for the typeface so narration never flashes in a fallback font.
+// Wait briefly for the typeface (so captions never flash in a fallback font)
+// and for the narration to be measured (captions are timed to the voice).
 const fonts = document.fonts
   ? Promise.all([
       document.fonts.load('500 1em "Cormorant Garamond"'),
       document.fonts.load('600 1em "Cormorant Garamond"'),
     ])
   : Promise.resolve();
-Promise.race([fonts, new Promise((resolve) => setTimeout(resolve, 2500))])
+Promise.race([Promise.all([fonts.catch(() => {}), narration.preload()]), new Promise((resolve) => setTimeout(resolve, 3000))])
   .catch(() => {})
   .then(startScene);
 
@@ -58,4 +60,4 @@ window.addEventListener('keydown', (event) => {
   if (debug && (event.key === 'r' || event.key === 'R')) manager.restart();
 });
 
-if (debug) window.__story = { manager, audio, stage, gsap };
+if (debug) window.__story = { manager, audio, narration, stage, gsap };

@@ -14,6 +14,7 @@ Everything personal lives in **`src/config.js`**:
 | the date under the title | `storyConfig.birthday` |
 | the letter text (Scene 7) | `letter` (exact wording; `\n` is a line break) |
 | recorded sounds | `audioFiles` (drop files in `public/audio/`, put relative paths here) |
+| narration | drop recordings in `public/audio/narration/` (file list and recording notes in its README) |
 
 ## Run
 
@@ -37,7 +38,8 @@ npm run preview      # serve the built dist/ locally
 | `?debug` | in production builds: expose `window.__story` and the **R** (restart scene) key |
 
 **M** toggles sound at any time. Sound only starts after **Begin** (browser rule), so a scene opened
-directly with `?scene=` plays silently.
+directly with `?scene=` plays silently, and Scene 1's three lines (which come before Begin) are heard
+only on **Watch again**. `?speed=` previews skip the narration (the voice can't follow).
 
 ## How the film is put together
 
@@ -53,7 +55,12 @@ directly with `?scene=` plays silently.
   moves parallax layers by depth and zooms the world (sky and stars stay put, like real distant things).
 - **The boy** (`components/character.js`): one SVG rig used everywhere — named poses, walk cycle, scarf, props in
   hand, sitting and lying.
-- **Narration** (`components/caption.js`): lines are sequenced so two never overlap.
+- **Narration** (`components/caption.js`, `audio/narration.js`): every storyteller line has a recording
+  (`audio/narrationScript.js`). Recordings are decoded and measured before a scene is built, so each
+  caption appears as its voice begins and stays until the voice has finished, plus a short breath (a longer
+  one for *tender* lines), never less than its own hold. Lines never overlap, and beats that must follow a
+  line (the shrug after "Close enough.", the scene cuts) wait for the voice. Music and ambience dip under
+  the voice. Scene 7 (the letter) has no narrator. A missing recording just means a caption-only line.
 
 ## Structure
 
@@ -67,7 +74,9 @@ src/
                           caption, cine button, wash, grain, sound toggle
   worlds/                 journey (town/forest), mountain, summit
   scenes/                 scene1Night … scene9Ending, afterCredits, characterLab (dev)
-  audio/                  audio manager (buses, unlock, levels), cues, procedural placeholders
+  audio/                  audio manager (buses, unlock, levels, ducking), cues, procedural placeholders,
+                          narration (script + playback)
   styles/                 tokens, base, stage, ui
 public/audio/             put recordings here
+public/audio/narration/   the storyteller's lines, one mp3 per line (scene1-01.mp3 …)
 ```

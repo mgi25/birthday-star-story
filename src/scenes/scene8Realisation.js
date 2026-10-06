@@ -49,11 +49,9 @@ export default {
 
     const story = el('div', 'story-ui', frame.ui);
     const captions = createCaptions(story, { reduced, announce: ctx.announce });
-    const [wrong, sometimes, sky] = [
-      'Maybe he had been looking in the wrong place all along.',
-      'Because sometimes…',
-      '…you don’t find the brightest thing by looking at the sky.',
-    ].map((t) => captions.line(t));
+    // "Maybe he had been looking in the wrong place all along."
+    // "Because sometimes…" "…you don’t find the brightest thing by looking at the sky."
+    const [wrong, sometimes, sky] = ['scene8-01', 'scene8-02', 'scene8-03'].map((id) => captions.narrated(id));
 
     const tl = gsap.timeline({ paused: true });
 

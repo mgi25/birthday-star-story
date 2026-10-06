@@ -40,4 +40,6 @@ export const BUS_LEVELS = {
   music: 0.7,
   ambience: 0.6,
   sfx: 0.85,
+  // Recordings are levelled on load (see narration.js), so this stays at unity.
+  narration: 1,
 };

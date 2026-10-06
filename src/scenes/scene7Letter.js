@@ -16,6 +16,9 @@ import { SIT_FRAME, SITTING, swingLegs } from './scene6QuietMoment.js';
  * camera leans in; the paper lifts out of his hands toward us until it can
  * be read. The words arrive a sentence at a time, with time to read each.
  * After the last line we stay with it. Then it settles back into his hands.
+ *
+ * No narrator here: she reads it herself. The voice stops and the wind and
+ * music fall away; the storyteller returns with Scene 8.
  */
 
 /** Where his front hand holds the paper (body coordinates, see POSES.holdFront). */
@@ -29,6 +32,7 @@ export default {
   ambience: 'amb.summit',
   ambienceLevel: 0.22,
   music: 0.06,
+  narration: false,
 
   create(ctx) {
     const { stage, audio, reduced, handoff } = ctx;

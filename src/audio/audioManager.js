@@ -1,10 +1,14 @@
 import { CUES, BUS_LEVELS } from './cues.js';
 import * as synth from './synth.js';
 
-const BUSES = ['music', 'ambience', 'sfx'];
+const BUSES = ['music', 'ambience', 'sfx', 'narration'];
+/** Buses that make up the bed under the narrator (dipped while a line is spoken). */
+const BED = ['music', 'ambience'];
 
 /**
- * Web Audio playback with three buses (music, ambience, sfx) into a master.
+ * Web Audio playback with four buses (music, ambience, sfx, narration) into
+ * a master. Music and ambience pass through a shared "bed" gain first, so
+ * they can dip together under the narrator's voice.
  *
  * Mobile browsers only allow sound after a user gesture, so nothing is
  * created until unlock() is called from inside a click handler (the Begin
@@ -17,6 +21,7 @@ class AudioManager {
     this.ctx = null;
     this.master = null;
     this.buses = {};
+    this.bed = null;
     this.buffers = new Map();
     this.loops = new Map();
     this.ambience = null;
@@ -57,10 +62,12 @@ class AudioManager {
     this.master = ctx.createGain();
     this.master.gain.value = this.muted ? 0 : 1;
     this.master.connect(ctx.destination);
+    this.bed = ctx.createGain();
+    this.bed.connect(this.master);
     for (const name of BUSES) {
       const bus = ctx.createGain();
       bus.gain.value = this.busTarget(name);
-      bus.connect(this.master);
+      bus.connect(BED.includes(name) ? this.bed : this.master);
       this.buses[name] = bus;
     }
 
@@ -170,6 +177,73 @@ class AudioManager {
       startSynth();
     }
     return handle;
+  }
+
+  /**
+   * Play an already-decoded buffer once on a bus, starting `offset` seconds
+   * into it. Returns a handle with stop(fadeSeconds), or null while locked.
+   */
+  playBuffer(buffer, { bus = 'sfx', volume = 1, offset = 0, fadeIn = 0 } = {}) {
+    if (!this.ctx || !buffer) return null;
+    const ctx = this.ctx;
+    const out = ctx.createGain();
+    out.connect(this.buses[bus] ?? this.master);
+    const now = ctx.currentTime;
+    if (fadeIn > 0) {
+      out.gain.setValueAtTime(0, now);
+      out.gain.linearRampToValueAtTime(volume, now + fadeIn);
+    } else {
+      out.gain.value = volume;
+    }
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+    source.connect(out);
+    source.start(now, Math.max(0, offset));
+    source.onended = () => out.disconnect();
+
+    let stopped = false;
+    return {
+      startedAt: now,
+      stop: (fade = 0.3) => {
+        if (stopped) return;
+        stopped = true;
+        const t = ctx.currentTime;
+        out.gain.cancelScheduledValues(t);
+        out.gain.setValueAtTime(out.gain.value, t);
+        out.gain.linearRampToValueAtTime(0, t + fade);
+        try {
+          source.stop(t + fade + 0.02);
+        } catch {
+          /* already ended */
+        }
+      },
+    };
+  }
+
+  /**
+   * Dip the bed (music + ambience) to `level` until `until` (context time),
+   * then let it swell back. A newer call takes over from an older one.
+   */
+  duck(level, { until, attack = 0.45, release = 1.4 } = {}) {
+    if (!this.bed) return;
+    const gain = this.bed.gain;
+    const t = this.ctx.currentTime;
+    const hold = Math.max(t + attack, until ?? t + attack);
+    gain.cancelScheduledValues(t);
+    gain.setValueAtTime(gain.value, t);
+    gain.linearRampToValueAtTime(level, t + attack);
+    gain.setValueAtTime(level, hold);
+    gain.linearRampToValueAtTime(1, hold + release);
+  }
+
+  /** Bring the bed straight back up (e.g. narration stopped early). */
+  unduck(release = 0.8) {
+    if (!this.bed) return;
+    const gain = this.bed.gain;
+    const t = this.ctx.currentTime;
+    gain.cancelScheduledValues(t);
+    gain.setValueAtTime(gain.value, t);
+    gain.linearRampToValueAtTime(1, t + release);
   }
 
   stop(id, { fade = 1 } = {}) {

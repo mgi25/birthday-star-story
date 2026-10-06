@@ -67,7 +67,7 @@ export default {
     const story = el('div', 'story-ui', frame.ui);
     story.style.top = 'calc(var(--u) * 352)';
     const captions = createCaptions(story, { reduced, announce: ctx.announce });
-    const found = captions.line('I guess I found my star after all.');
+    const found = captions.narrated('scene9-01'); // "I guess I found my star after all."
 
     const card = el('div', 'title-card', frame.ui);
     const name = el('p', 'title-card__name', card);

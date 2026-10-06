@@ -5,7 +5,7 @@
  */
 export const storyConfig = {
   /** Shown on the final title: "Happy Birthday, <herName>" */
-  herName: 'HER NAME',
+  herName: 'Hina',
 
   /**
    * The letter the stars quietly form in the last scene (A–Z).
