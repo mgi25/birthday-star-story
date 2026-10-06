@@ -1,0 +1,53 @@
+/* The summit sky (Scenes 5–9): the deepest of the film, glowing faintly
+   above the sea of cloud. Percentages map to world y = -260 + 1300 * p. */
+.sky--summit {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(var(--u) * -260);
+  height: calc(var(--u) * 1300);
+  background:
+    radial-gradient(95% 12% at 50% 83%, rgba(126, 108, 178, 0.3), transparent),
+    linear-gradient(
+      to bottom,
+      #010208 0%,
+      #02051a 20%,
+      #060b27 42%,
+      #0c1236 60%,
+      #171b46 74%,
+      #262658 82%,
+      #2c2a5c 85%,
+      #1c1d4b 100%
+    );
+}
+
+/* The Milky Way: clearer up here than it ever was in town. */
+.sky--summit::before,
+.sky--summit::after {
+  content: '';
+  position: absolute;
+  left: -50%;
+  width: 200%;
+  transform: rotate(-26deg);
+}
+
+.sky--summit::before {
+  top: 30%;
+  height: 16%;
+  background: radial-gradient(50% 50% at 50% 50%, rgba(170, 168, 232, 0.13), rgba(160, 160, 225, 0.05) 50%, transparent 76%);
+}
+
+.sky--summit::after {
+  top: 34%;
+  height: 7%;
+  background: radial-gradient(50% 50% at 46% 50%, rgba(205, 196, 240, 0.08), transparent 70%);
+}
+
+/* Darkening the world at the very end (above the picture, below the title). */
+.end-dark {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+}

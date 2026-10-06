@@ -1,0 +1,41 @@
+/* Scene 1 — The Night */
+
+/*
+ * The sky is one tall gradient that the camera slides along at depth 0.25:
+ * looking up shows the near-black top, tilting down reveals the soft
+ * purple horizon glow behind the mountains.
+ * Percentages map to world y as: y = -400 + 1400 * p.
+ */
+.sky--night {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(var(--u) * -400);
+  height: calc(var(--u) * 1400);
+  background:
+    radial-gradient(75% 7% at 50% 73.5%, rgba(104, 84, 150, 0.32), transparent),
+    linear-gradient(
+      to bottom,
+      #010309 0%,
+      #040820 28%,
+      #081030 45%,
+      #0e1540 58%,
+      #191e4b 66%,
+      #29295b 72%,
+      #363163 75.5%,
+      #23234f 83%,
+      #121535 100%
+    );
+}
+
+/* A barely-there band of the Milky Way. */
+.sky--night::before {
+  content: '';
+  position: absolute;
+  left: -40%;
+  width: 180%;
+  top: 31%;
+  height: 15%;
+  background: radial-gradient(50% 50% at 50% 50%, rgba(160, 160, 225, 0.085), rgba(160, 160, 225, 0.035) 45%, transparent 75%);
+  transform: rotate(-22deg);
+}

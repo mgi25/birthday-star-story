@@ -1,0 +1,200 @@
+/*
+ * The stage behaves like a movie screen: fixed, full-bleed, nothing scrolls.
+ *
+ * Paint order (all inside the .stage stacking context):
+ *   0  .scene__picture  backdrop (sky, stars) + zoomable world (layers, characters)
+ *   1  .stage__vignette
+ *   2  .stage__grain
+ *   3  .scene__ui      captions and buttons
+ *   10 .stage__veil    black used for fades between scenes
+ *   11 .sound-toggle
+ * .stage__scenes and .scene must never get opacity/transform/z-index, or they
+ * would become stacking contexts and break this interleaving. (Dissolves fade
+ * .scene__picture, which is its own stacking context below the vignette.)
+ */
+.stage {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--c-black);
+  isolation: isolate;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.stage__scenes,
+.scene {
+  position: absolute;
+  inset: 0;
+}
+
+/* The picture = backdrop (sky, stars: never zoomed) + world (zoomable). */
+.scene__picture {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.scene__backdrop {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* No clipping here: it would clip before the zoom is applied. The picture clips. */
+.scene__world {
+  position: absolute;
+  inset: 0;
+}
+
+.scene__world {
+  transform-origin: 50% 60%;
+}
+
+/* A full-frame wash used for passing through cloud and for dimming. */
+.scene__wash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.scene__ui {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.scene__ui button {
+  pointer-events: auto;
+}
+
+/* ---------- parallax layers ---------- */
+
+.layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.layer__band {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+}
+
+.layer__drift {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+
+.starfield {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- characters ---------- */
+
+.character {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: calc(var(--u) * 140);
+  height: calc(var(--u) * 165);
+  overflow: visible;
+  transform-origin: calc(var(--u) * 70) calc(var(--u) * 150);
+  will-change: transform;
+}
+
+/* ---------- screen treatments ---------- */
+
+.stage__vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(
+    130% 95% at 50% 46%,
+    transparent 52%,
+    rgba(0, 0, 0, calc(var(--vignette-strength) * 0.6)) 80%,
+    rgba(0, 0, 0, var(--vignette-strength)) 100%
+  );
+}
+
+.stage__grain {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  z-index: 2;
+  pointer-events: none;
+  opacity: var(--grain-opacity);
+  background-size: 180px 180px;
+  animation: grain-shift 1s steps(1) infinite;
+  will-change: transform;
+}
+
+@keyframes grain-shift {
+  0% { transform: translate3d(0, 0, 0); }
+  12% { transform: translate3d(-7%, 4%, 0); }
+  25% { transform: translate3d(5%, -9%, 0); }
+  37% { transform: translate3d(-11%, -3%, 0); }
+  50% { transform: translate3d(9%, 7%, 0); }
+  62% { transform: translate3d(-4%, 11%, 0); }
+  75% { transform: translate3d(12%, -6%, 0); }
+  87% { transform: translate3d(-8%, -10%, 0); }
+}
+
+.stage__veil {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  background: var(--c-black);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage__grain {
+    animation: none;
+  }
+}
+
+.stage[data-quality='low'] .stage__grain {
+  animation: none;
+}
+
+/* Passing through cloud between the climb and the summit. */
+.wash--cloud {
+  background:
+    radial-gradient(120% 60% at 30% 35%, rgba(98, 98, 150, 0.55), transparent 70%),
+    radial-gradient(110% 70% at 75% 70%, rgba(80, 80, 132, 0.5), transparent 70%),
+    linear-gradient(to bottom, #2c2e62, #383a70 55%, #303266);
+}
+
+/* A bank of cloud the camera rises through (taller than the frame; opaque in the middle). */
+.wash--mist {
+  inset: -60% 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(56, 58, 112, 0),
+    rgba(56, 58, 112, 0.9) 14%,
+    #3a3c73 22%,
+    #3d3f77 50%,
+    #3a3c73 78%,
+    rgba(56, 58, 112, 0.9) 86%,
+    rgba(56, 58, 112, 0)
+  );
+}

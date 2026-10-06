@@ -1,0 +1,27 @@
+/*
+ * Design tokens. Colours here are for UI and type; illustration colours
+ * live in src/core/palette.js so SVG builders and CSS stay in sync.
+ */
+:root {
+  --c-black: #000;
+  --c-night-0: #02040b;
+  --c-night-1: #060a1c;
+  --c-cream: #f3ead7;
+  --c-cream-soft: rgba(243, 234, 215, 0.78);
+  --c-cream-faint: rgba(243, 234, 215, 0.34);
+  --glow-rgb: 255, 214, 140;
+
+  --font-story: 'Cormorant Garamond', 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --gutter: 24px;
+
+  /* One "world unit". The stage is 1000 units tall; JS keeps this in sync. */
+  --u: 1px;
+
+  --grain-opacity: 0.045;
+  --vignette-strength: 0.55;
+}

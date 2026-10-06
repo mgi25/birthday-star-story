@@ -1,0 +1,332 @@
+/*
+ * Film UI: narration, the restrained "cine" button, the sound toggle and
+ * the end card. Nothing here should look like a web page component.
+ */
+
+/* ---------- narration block ---------- */
+
+.story-ui {
+  position: absolute;
+  left: 0;
+  right: 0;
+  /* Sits in the sky, between the hero star and the town skyline. */
+  top: calc(var(--u) * 282);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: max(20px, calc(var(--u) * 40));
+  padding-left: max(var(--gutter), var(--safe-left));
+  padding-right: max(var(--gutter), var(--safe-right));
+}
+
+.captions {
+  display: grid;
+  align-items: center;
+  justify-items: center;
+  width: min(100%, 19em);
+  font-size: 1.45rem;
+  font-size: clamp(1.35rem, min(1.05rem + 1.9vw, 5.4svh), 2.25rem);
+}
+
+.caption {
+  grid-area: 1 / 1;
+  margin: 0;
+  max-width: 100%;
+  text-align: center;
+  font-family: var(--font-story);
+  font-weight: 500;
+  line-height: 1.32;
+  letter-spacing: 0.006em;
+  color: var(--c-cream);
+  text-wrap: balance;
+  overflow-wrap: break-word;
+  text-shadow:
+    0 0 1.1em rgba(var(--glow-rgb), 0.14),
+    0 1px 0.2em rgba(2, 3, 12, 0.9);
+  visibility: hidden;
+}
+
+.caption .word {
+  display: inline-block;
+  will-change: transform, opacity;
+}
+
+/* ---------- cine button ---------- */
+
+.cine-button {
+  position: relative;
+  min-width: 9.5rem;
+  min-height: 48px;
+  padding: 0.85em 2.3em 0.8em;
+  border: 1px solid var(--c-cream-faint);
+  border-radius: 999px;
+  background: rgba(6, 9, 26, 0.42);
+  color: var(--c-cream);
+  font-family: var(--font-story);
+  font-weight: 600;
+  font-size: 1.02rem;
+  letter-spacing: 0.32em;
+  text-indent: 0.32em; /* optically recentre the tracked caps */
+  text-transform: uppercase;
+  cursor: pointer;
+  visibility: hidden;
+  transition:
+    border-color 0.5s ease,
+    box-shadow 0.5s ease,
+    background-color 0.5s ease;
+}
+
+.cine-button:hover {
+  border-color: rgba(243, 234, 215, 0.7);
+  background: rgba(10, 14, 36, 0.55);
+  box-shadow: 0 0 2.2em rgba(var(--glow-rgb), 0.16);
+}
+
+.cine-button:focus {
+  outline: none;
+}
+
+.cine-button:focus-visible {
+  outline: 2px solid rgba(var(--glow-rgb), 0.85);
+  outline-offset: 5px;
+}
+
+.cine-button[disabled] {
+  cursor: default;
+}
+
+/* ---------- sound toggle ---------- */
+
+.sound-toggle {
+  position: absolute;
+  z-index: 11;
+  top: max(10px, var(--safe-top));
+  right: max(10px, var(--safe-right));
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--c-cream);
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.8s ease,
+    visibility 0s linear 0.8s;
+}
+
+.sound-toggle.is-visible {
+  opacity: 0.42;
+  visibility: visible;
+  transition: opacity 0.8s ease;
+}
+
+.sound-toggle.is-visible:hover,
+.sound-toggle.is-visible:focus-visible {
+  opacity: 0.9;
+}
+
+.sound-toggle:focus {
+  outline: none;
+}
+
+.sound-toggle:focus-visible {
+  outline: 2px solid rgba(var(--glow-rgb), 0.85);
+  outline-offset: 2px;
+}
+
+.sound-toggle svg {
+  width: 22px;
+  height: 22px;
+}
+
+.sound-toggle .icon-off {
+  display: none;
+}
+
+.sound-toggle[aria-pressed='true'] .icon-on {
+  display: none;
+}
+
+.sound-toggle[aria-pressed='true'] .icon-off {
+  display: block;
+}
+
+/* ---------- dev lab ---------- */
+
+.lab-label {
+  position: absolute;
+  top: max(14px, var(--safe-top));
+  left: max(16px, var(--safe-left));
+  margin: 0;
+  font-size: 0.95rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--c-cream-soft);
+}
+
+/* ---------- short screens ---------- */
+
+/* Phones held sideways: pull the narration up and tighten it so the
+   button clears the skyline. */
+@media (max-height: 520px) {
+  .story-ui {
+    top: calc(var(--u) * 252);
+    gap: 10px;
+  }
+
+  .captions {
+    font-size: 1.25rem;
+  }
+
+  .cine-button {
+    min-height: 44px;
+    padding-top: 0.7em;
+    padding-bottom: 0.65em;
+  }
+}
+
+/* ---------- the letter ---------- */
+
+.letter {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: min(88vw, 31rem);
+  margin-left: calc(min(88vw, 31rem) / -2);
+  pointer-events: none;
+  visibility: hidden;
+  transform-origin: 50% 50%;
+  will-change: transform, opacity;
+}
+
+.letter__paper {
+  position: relative;
+  padding: clamp(22px, 6.5vw, 42px) clamp(20px, 6vw, 46px) clamp(18px, 5vw, 34px);
+  border-radius: 3px;
+  color: #2b2440;
+  background-color: #efe5cd;
+  background-image:
+    /* two soft fold creases: it has been folded in thirds a long time */
+    linear-gradient(
+      to bottom,
+      transparent 32.6%,
+      rgba(118, 96, 62, 0.13) 33.2%,
+      rgba(255, 255, 255, 0.22) 33.7%,
+      transparent 35%,
+      transparent 65.8%,
+      rgba(118, 96, 62, 0.12) 66.4%,
+      rgba(255, 255, 255, 0.2) 66.9%,
+      transparent 68.2%
+    ),
+    radial-gradient(120% 80% at 46% 30%, rgba(255, 252, 240, 0.35), transparent 62%),
+    radial-gradient(150% 130% at 50% 50%, transparent 58%, rgba(150, 120, 70, 0.2));
+  box-shadow:
+    0 26px 60px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(110, 88, 56, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.letter__body {
+  font-family: var(--font-story);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1.04rem;
+  font-size: clamp(1.02rem, 0.86rem + 1.15vw, 1.34rem);
+  line-height: 1.5;
+}
+
+.letter__para {
+  margin: 0 0 0.8em;
+  text-wrap: pretty;
+  opacity: 0;
+}
+
+.letter__para:last-child {
+  margin: 1.1em 0 0;
+}
+
+/* dims the world behind the letter (sits in the picture, below the UI) */
+.wash--dim {
+  background: #02030b;
+}
+
+/* ---------- the final title ---------- */
+
+.title-card {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.1rem;
+  padding-left: max(var(--gutter), var(--safe-left));
+  padding-right: max(var(--gutter), var(--safe-right));
+  text-align: center;
+}
+
+.title-card__name {
+  margin: 0;
+  max-width: 14em;
+  font-weight: 500;
+  font-size: 2rem;
+  font-size: clamp(1.9rem, 1.2rem + 3.4vw, 3.2rem);
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+  color: var(--c-cream);
+  text-wrap: balance;
+  text-shadow: 0 0 1.2em rgba(var(--glow-rgb), 0.18);
+  visibility: hidden;
+}
+
+.title-card__date {
+  margin: 0;
+  font-weight: 600;
+  font-size: 0.92rem;
+  letter-spacing: 0.34em;
+  text-indent: 0.34em;
+  color: var(--c-cream-soft);
+  visibility: hidden;
+}
+
+.title-card__note {
+  margin: 0.6rem 0 0;
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(1.1rem, 0.95rem + 0.8vw, 1.4rem);
+  color: var(--c-cream-soft);
+  visibility: hidden;
+}
+
+/* ---------- after the credits ---------- */
+
+.credits-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(var(--u) * 560);
+  margin: 0;
+  padding: 0 var(--gutter);
+  text-align: center;
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(1.2rem, 1rem + 1vw, 1.6rem);
+  color: var(--c-cream);
+  visibility: hidden;
+}
+
+.credits-again {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  display: flex;
+  justify-content: center;
+  transform: translateY(-50%);
+}
